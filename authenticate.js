@@ -12,7 +12,7 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 exports.getToken = function(user) {
-    return jwt.sign(user, config.secretKey, {expiresIn: 3600});
+    return jwt.sign(user, config.secretKey, { expiresIn : 3600000 });
 };
 
 var opts = {};
@@ -35,3 +35,14 @@ exports.jwtPassport = passport.use(new JwtStrategy(opts, (jwt_payload, done) => 
 }));
 
 exports.verifyUser = passport.authenticate('jwt', {session: false});
+
+exports.verifyAdmin = (req, res, next) => {
+    if(req.user.admin){
+        next();   // is a admin
+    }
+    else{
+        err = new Error("You are not authorized to perform this operation!");
+        err.status = 403;
+        return next(err);
+    }
+}
